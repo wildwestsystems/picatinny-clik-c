@@ -72,7 +72,7 @@ int clik_get_payload_status_resp_unpack(clik_get_payload_status_resp_t *msg, con
     size_t idx = 0;
     (void)payload_len;  /* May be unused */
     msg->error_code = (clik_response_code_t)payload[idx++];
-    msg->status = (clik_channel_status_t)payload[idx++];
+    msg->status = (clik_payload_status_t)payload[idx++];
     msg->available_net_interfaces = payload[idx++];
     msg->active_net_interfaces = payload[idx++];
     msg->number_of_functions = payload[idx++];
@@ -433,6 +433,10 @@ int clik_set_payload_network_config_req_pack(const clik_set_payload_network_conf
     size_t idx = 0;
     payload[idx++] = msg->interface_index;
     payload[idx++] = msg->interface_enabled;
+    /* Array ip_address (fixed size 4) */
+    memcpy(payload + idx, msg->ip_address, 4);
+    idx += 4;
+    payload[idx++] = msg->subnet_bits;
     *payload_len = (uint8_t)idx;
     return CLIK_OK;
 }
@@ -442,6 +446,10 @@ int clik_set_payload_network_config_req_unpack(clik_set_payload_network_config_r
     (void)payload_len;  /* May be unused */
     msg->interface_index = payload[idx++];
     msg->interface_enabled = payload[idx++];
+    /* Array ip_address (fixed size 4) */
+    memcpy(msg->ip_address, payload + idx, 4);
+    idx += 4;
+    msg->subnet_bits = payload[idx++];
     return CLIK_OK;
 }
 
@@ -501,16 +509,17 @@ int clik_set_payload_network_config_resp_from_frame(clik_set_payload_network_con
 
 int clik_set_payload_network_state_req_pack(const clik_set_payload_network_state_req_t *msg, uint8_t *payload, uint8_t *payload_len) {
     size_t idx = 0;
-    (void)msg;  /* Unused */
-    *payload_len = 0;
+    payload[idx++] = msg->interface_index;
+    payload[idx++] = msg->network_state;
+    *payload_len = (uint8_t)idx;
     return CLIK_OK;
 }
 
 int clik_set_payload_network_state_req_unpack(clik_set_payload_network_state_req_t *msg, const uint8_t *payload, uint8_t payload_len) {
     size_t idx = 0;
     (void)payload_len;  /* May be unused */
-    (void)msg;  /* Unused */
-    (void)payload;  /* Unused */
+    msg->interface_index = payload[idx++];
+    msg->network_state = payload[idx++];
     return CLIK_OK;
 }
 

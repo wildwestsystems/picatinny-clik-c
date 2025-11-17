@@ -31,7 +31,7 @@ int clik_get_payload_status_req_from_frame(
 /* Message ID: 0x0000 - GetPayloadStatus Response */
 typedef struct {
     clik_response_code_t error_code;
-    clik_channel_status_t status;
+    clik_payload_status_t status;
     uint8_t available_net_interfaces;
     uint8_t active_net_interfaces;
     uint8_t number_of_functions;
@@ -220,6 +220,8 @@ int clik_set_function_state_resp_from_frame(
 typedef struct {
     uint8_t interface_index;
     uint8_t interface_enabled;
+    uint8_t ip_address[4];
+    uint8_t subnet_bits;
 } clik_set_payload_network_config_req_t;
 
 int clik_set_payload_network_config_req_pack(
@@ -257,7 +259,8 @@ int clik_set_payload_network_config_resp_from_frame(
 
 /* Message ID: 0x0006 - SetPayloadNetworkState Request */
 typedef struct {
-    uint8_t _dummy;  /* Empty struct not allowed in C */
+    uint8_t interface_index;
+    uint8_t network_state;
 } clik_set_payload_network_state_req_t;
 
 int clik_set_payload_network_state_req_pack(
